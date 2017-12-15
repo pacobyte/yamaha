@@ -7,7 +7,7 @@ unit = "MAIN"
 
 # default hostname and port
 hostname = "av"
-port = "50000"
+port = 50000
 
 class YamahaException(Exception):
 	def __init__(self, value):
@@ -26,9 +26,9 @@ class Yamaha:
 		s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
 		s.settimeout(1.0)
 		try:
-			s.connect(("av", 50000))
-			s.send(command)
-			data = s.recv(512)
+			s.connect((self.hostname, self.port))
+			s.send(command.encode())
+			data = s.recv(512).decode()
 			s.close()
 			if "@UNDEFINED" in data or "@RESTRICTED" in data:
 				raise YamahaException("message: %s response: %s" % (command, data))
@@ -100,16 +100,16 @@ if __name__ == "__main__":
 	try:
 		opts, args = getopt.getopt(sys.argv[1:], "ha:p:u:", ["address=", "port=", "unit="])
 	except:
-		print usage
+		print(usage)
 		sys.exit(1)
 	if len(args) == 0:
-		print usage
+		print(usage)
 		sys.exit(1)
 	command = args[0].upper()
 	arguments = ' '.join(args[1:])
 	for opt, arg in opts:
 		if opt in ("-h"):
-			print usage
+			print(usage)
 			sys.exit(0)
 		if opt in ("-a", "--address"):
 			hostname = arg
@@ -119,5 +119,5 @@ if __name__ == "__main__":
 			unit = arg.upper()
 
 	y = Yamaha(hostname, port)
-	print y.send(unit, command, arguments)
+	print(y.send(unit, command, arguments))
 
